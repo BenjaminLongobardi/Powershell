@@ -1,4 +1,7 @@
-﻿#region help
+﻿#this Script has been canned
+
+
+#region help
 <#
 
     .SYNOPSIS
@@ -10,6 +13,8 @@
 
     .PARAMETER
         Ok so I'm not sure how much extra nonsense we might need , but here is what I put functionality for
+        I excluded technically deep flags because I genuinely have no clue what they do or how they're useful
+
         - Varname                - Required? - VarType          - DefaultValue
         - $Credential            - yes       - [PSCredential]   - 
         - $Name                  - yes       - [String]         -
@@ -314,6 +319,16 @@ Function New-ADUser-Ccdc{
     }
 
     #endregion Generate Password
+
+    #region Create the User In AD
+
+    #endregion create user
+
+    #region Post User Creation - Additional Property Adding
+
+    
+
+    #endregion ahhhhhhhhhhhh
 
 
 
