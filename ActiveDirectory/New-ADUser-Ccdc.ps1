@@ -6,10 +6,44 @@
 
     .DESCRIPTION
         This module will take a set of information and create a user account for it. The idea is to
-        simply run New-ADUser, but to assume certain flags.
+        simply run New-ADUser, assume certain flags, and add optional flags to the user object after creation
 
     .PARAMETER
-        Ok so I'm not sure how much extra nonsense we might need 
+        Ok so I'm not sure how much extra nonsense we might need , but here is what I put functionality for
+        - Varname                - Required? - VarType          - DefaultValue
+        - $Credential            - yes       - [PSCredential]   - 
+        - $Name                  - yes       - [String]         -
+        - $Password              - no        - [String]         -
+        - $Enabled               - no        - [Boolean]        - $true
+        - $ChangePasswordAtLogon - no        - [String]         -
+        - $LogonWorkStations     - no        - [string]         -
+        - $City                  - no        - [string]         -
+        - $Company               - no        - [string]         -
+        - $Country               - no        - [string]         -
+        - $Department            - no        - [string]         -
+        - $Description           - no        - [string]         -
+        - $DisplayName           - no        - [string]         -
+        - $Division              - no        - [string]         -
+        - $EmailAddress          - no        - [string]         -
+        - $EmployeeID            - no        - [string]         -
+        - $EmployeeNumber        - no        - [string]         -
+        - $OtherName             - no        - [string]         -
+        - $Fax                   - no        - [string]         -
+        - $GivenName             - no        - [string]         -
+        - $HomePage              - no        - [string]         -
+        - $HomePhone             - no        - [string]         -
+        - $Initials              - no        - [string]         -
+        - $Manager               - no        - [string]         -
+        - $MobilePhone           - no        - [string]         -
+        - $OfficePhone           - no        - [string]         -
+        - $Organization          - no        - [string]         -
+        - $OtherAttributes       - no        - [hashtable]      -
+        - $POBox                 - no        - [string]         -
+        - $PostalCode            - no        - [string]         -
+        - $State                 - no        - [string]         -
+        - $StreetAddress         - no        - [string]         -
+        - $SurName               - no        - [string]         -
+        - $Title                 - no        - [string]         -
 
     .NOTES
         Original Author:        Benjamin Longobardi
@@ -23,7 +57,7 @@
 
     .LINK
         github.com/benjaminlongobardi
-
+        
 #>
 
 ## End Help Section ##
@@ -67,12 +101,14 @@ Function New-ADUser-Ccdc{
                     ValueFromPipeline=$false,
                     ValueFromPipelineByPropertyName=$true,
                     Position=0)]
-        [string] $Enabled="$true",
+                    [ValidateSet($true, $false)]
+        [boolean] $Enabled=$true,
 
         [Parameter(Mandatory=$false,
                     ValueFromPipeline=$false,
                     ValueFromPipelineByPropertyName=$true,
                     Position=0)]
+                    [ValidateSet($true, $false)]
         [boolean] $ChangePasswordAtLogon,
 
         [Parameter(Mandatory=$false,
@@ -255,7 +291,7 @@ Function New-ADUser-Ccdc{
     #endregion Param
 
     #region check Name Length
-
+    
     if ($Name.Length -gt 20){
         Write-Host $("`n$Name is longer than 20 characters, please try again") -ForegroundColor Red -BackgroundColor Black
         Write-Host
@@ -265,9 +301,21 @@ Function New-ADUser-Ccdc{
 
     #region Generate Password
 
+    #If we supplied passwords, use those... INSECURE / CHANGE IMMEDIATELY
+    if($Password){
+        $SecurePassword = $Password | ConvertTo-SecureString -AsPlainText -Force
+    }
+    else{ #No password supplied
+        [Reflection.Assembly]::LoadWithPartialName("System.Web")
+        
+        $UnsecurePassword = [System.Web.Security.Membership]::GeneratePassword(10,0)
 
+        $SecurePassword = ($UnsecurePassword | ConvertTo-SecureString -AsPlainText -Force)
+    }
 
     #endregion Generate Password
+
+
 
 
 
