@@ -9,6 +9,8 @@
             1: Rename the current computer's administrator account to something other than administrator.
             2: Create a new user and make that user named Administrator with matching description
             3: Disable the current computer's admin account if allowed
+
+            The script is intended for use with a small amount of computers, as you input a password each time
             
         *I would like to do the following but not sure if I should here.
             1: Set up logging and alerts for the new honeypot admin
@@ -72,21 +74,39 @@ Function Hide-Admin
                     ValueFromPipeline=$false,
                     ValueFromPipelineByPropertyName=$false,
                     Position=0)]
-        [boolean] $DisableBuiltinAdmin
+        [boolean] $DisableBuiltinAdmin,
+
+        [Parameter(Mandatory=$true,
+                    ValueFromPipeline=$false,
+                    ValueFromPipelineByPropertyName=$false,
+                    Position=0)]
+        [SecureString] $NewPassword
     )
 
     #region -- Main Script Functionality
 
+        
+        #region -- check vars
+            if($NewAdminName.Length -GT 20){
+                $WriteHost = Write-Host $("`nThe given name $NewAdminName is over 20 characters and is not allowed. Exiting...") -ForegroundColor Red -BackgroundColor Black
+                $WriteHost
+
+                break;
+            }
+
+        #endregion check vars
 
         # Rename the local Administrator
-        Get-LocalUser | Where-Object -Property "SID" -Like "*-500" | Rename-LocalUser -NewName $NewAdminName 
-        $WriteHost = Write-Host $("`nLocal Admin renamed to $NewAdminName") -ForegroundColor Green -BackgroundColor Black
-        $WriteHost
+            Get-LocalUser | Where-Object -Property "SID" -Like "*-500" | Rename-LocalUser -NewName $NewAdminName 
+            $WriteHost = Write-Host $("`nLocal Admin renamed to $NewAdminName") -ForegroundColor Green -BackgroundColor Black
+            $WriteHost
 
         #region -- Create new User and clone administrator properties
 
-            New-LocalUser -Name "Administrator" -Password (Read-Host -AsSecureString -Prompt "Enter New Password") `
-            -Description "Built-in account for administering the computer/domain" 
+            $description = "Built-in account for administering the computer"
+
+            New-LocalUser -Name "Administrator" -Password $NewPassword `
+            -Description $description
             $WriteHost = Write-Host $("`nDummy Admin created") -ForegroundColor Blue -BackgroundColor Black
             $WriteHost
 
