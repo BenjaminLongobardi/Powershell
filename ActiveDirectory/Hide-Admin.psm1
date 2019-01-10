@@ -50,7 +50,7 @@
 ##End Help Section##
 
 #region -- function
-Function New-Fakemin
+Function Hide-Admin
 {
     [CmdletBinding `
     (
