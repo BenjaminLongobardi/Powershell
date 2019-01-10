@@ -77,9 +77,12 @@ Function Get-ThenInstall
 
         
         # The script silently installs chrome, however we can use it to silently install anything
+        
+        write-host "printing installer destination"
+        write-host $InstallerDestination
 
         # Path for the workdir
-        if($InstallerDestination -eq $null){
+        if($InstallerDestination -eq ""){
             $workdir = "c:\installer\"
         }
         else{
