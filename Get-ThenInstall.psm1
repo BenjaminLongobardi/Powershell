@@ -95,15 +95,25 @@ Function Get-ThenInstall
         ELSE
         { New-Item -Path $workdir  -ItemType directory }
 
+        # Is it an EXE or an MSI installer
+
+        $FileType = $DownloadLink.Remove(0, ($DownloadLink.Length -3))
+
         # Download the installer
 
         $source = $DownloadLink
-        $destination = "$workdir\$AppName.msi"
+        $destination = "$workdir\$AppName.$FileType"
         Invoke-WebRequest $source -OutFile $destination
         
         # Start the installation
 
-        msiexec.exe /i "$workdir\$AppName.msi" /q /norestart 
+        if($FileType -like "msi"){
+            msiexec.exe /i "$workdir\$AppName.msi" /q /norestart 
+        }
+        elseif($FileType -like "exe"){
+            $RunCommand = "$workdir$AppName.exe"
+            Invoke-Expression $RunCommand
+        }
 
         # Wait XX Seconds for the installation to finish
 
