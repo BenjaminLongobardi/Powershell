@@ -17,6 +17,12 @@
 
 #>
 
+#region -- Dot Source Required Modules
+
+. .\ScriptsIFoundOnline\UserRights.psm1
+
+#endregion
+
 #region -- Variable declarations
 
 $CurrentPCInfo = Get-WmiObject -Class win32_computersystem
@@ -67,24 +73,44 @@ $CurrentPCFQDN = $CurrentPC.Name + "." + $CurrentPC.Domain
     #region -- Anonymous Enumeration of shares must be restricted
     #Null sessions should not have this right, as anonymous users can map a network and search for attack vectors
         
-        
+        #RSAT
 
     #endregion
 
-    #The act as part of the operating system user right must not be assigned to any groups or accounts
-    #
-    #
-    #
+    #region -- The act as part of the operating system user right must not be assigned to any groups or accounts
+    #users with this right can masquerade as othr users and gain full access to a system
 
-    #Anonymous Access to registry must be restricted
-    #
-    #
-    #
+        #UserRights module - Group policy
+        #Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+        #this policy should be defined with no accounts assigned to it
 
-    #The LanMan authentication level must be set to ntlmv2 response only, and refuse LM and NTLM
-    #
-    #
-    #
+    #endregion
+
+    #region -- Anonymous Access to registry must be restricted
+    #Some processes need this. others do not. Print this into the report to handle it manually from there
+
+        # this key should exist wih these values
+
+        # HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\SecurePipeServers\Winreg\ 
+        # Administrators - Full 
+        # Backup Operators - Read(QENR)
+        # Local Service - Read
+    
+    #endregion
+
+    #region -- The LanMan authentication level must be set to ntlmv2 response only, and refuse LM and NTLM
+    #LM and NTLM should only be allowed for backwards compatability purposes. They are not secure and those components forcing this compatability requirement should be reworked
+        
+        # Analyze the system using the Security Configuration and Analysis snap-in. 
+        # Expand the Security Configuration and Analysis tree view. 
+        # Navigate to Local Policies -> Security Options. 
+        # If the value for "Network security: LAN Manager authentication level" is not set to "Send NTLMv2 response only. Refuse LM & NTLM" (Level 5), this is a finding.
+
+        #The policy referenced configures the following registry value:
+        # HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Lsa\
+        # Value Name: LmCompatibilityLevel
+
+    #endregion
 
     #Reversible password encryption must be disabled
     #
