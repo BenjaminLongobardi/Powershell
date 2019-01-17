@@ -1,5 +1,10 @@
 <#
 
+    .TODO
+        This is a list of things I left off on so I dont forget to go back and do them
+        1. Find the SID for act as a part of the OS so I can use it in that section
+
+
     .SYNOPSIS
         This script will go through the windows server machines and change all necessary options to be 
         compliant with Windows Server 2012/2012 R2 Domain Controller Security Technical Implementation Guide
@@ -83,6 +88,11 @@ $CurrentPCFQDN = $CurrentPC.Name + "." + $CurrentPC.Domain
         #UserRights module - Group policy
         #Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
         #this policy should be defined with no accounts assigned to it
+
+        $ActAsOSAccounts = Get-AccountsWithUserRight -SidForUnresolvedName 
+
+        $html += "<h5>Act as a part of the OS user right</h5><p>Note: the affected accounts must relog</p>"
+
 
     #endregion
 
