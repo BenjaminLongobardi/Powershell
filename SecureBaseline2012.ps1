@@ -3,6 +3,7 @@
     .TODO
         This is a list of things I left off on so I dont forget to go back and do them
         1. Find the SID for act as a part of the OS so I can use it in that section
+        2. Create a GPO that does everything right and import it.
 
 
     .SYNOPSIS
