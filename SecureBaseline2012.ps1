@@ -90,9 +90,19 @@ $CurrentPCFQDN = $CurrentPC.Name + "." + $CurrentPC.Domain
         #Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
         #this policy should be defined with no accounts assigned to it
 
-        $ActAsOSAccounts = Get-AccountsWithUserRight -SidForUnresolvedName 
+        $ActAsOSAccounts = Get-AccountsWithUserRight -Right SeTcbPrivilege
+
+        foreach($account in $ActAsOSAccounts){
+            Revoke-UserRight -Account $account -Right SeTcbPrivilege
+            
+        }
 
         $html += "<h5>Act as a part of the OS user right</h5><p>Note: the affected accounts must relog</p>"
+        $html += "<ul>"
+        foreach($account in $ActAsOSAccounts){
+            $html += "<li>" + $account.Name + "</li>"
+        }
+        $html += "</ul>"
 
 
     #endregion
