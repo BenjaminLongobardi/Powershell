@@ -79,7 +79,16 @@ $CurrentPCFQDN = $CurrentPC.Name + "." + $CurrentPC.Domain
     #region -- Anonymous Enumeration of shares must be restricted
     #Null sessions should not have this right, as anonymous users can map a network and search for attack vectors
         
-        #RSAT
+        $AnonEnumOfShares = ls -Path HKLM:\SYSTEM\CurrentControlSet\Control\Lsa | Select-Object Name,Property | Where-Object -Property Name -Like *RestrictAnonymous
+        $html += "<h5>Anonymous Enumeration of Shares</h5><p>This should be defined and set to not allowed</p>"
+        if($AnonEnumOfShares -eq ""){
+            #if nothing is set here set it
+            New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" -Name "RestrictAnonymous" -Value "Enabled"  -PropertyType "String"
+        }
+        elseIf($AnonEnumOfShares.Property -like "*Disabled*"){
+            Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Lsa' -Name 'RestrictAnonymous' -value 'Enabled'
+        }
+
 
     #endregion
 
@@ -94,10 +103,9 @@ $CurrentPCFQDN = $CurrentPC.Name + "." + $CurrentPC.Domain
 
         foreach($account in $ActAsOSAccounts){
             Revoke-UserRight -Account $account -Right SeTcbPrivilege
-            
         }
 
-        $html += "<h5>Act as a part of the OS user right</h5><p>Note: the affected accounts must relog</p>"
+        $html += "<h5>Act as a part of the OS user right</h5><p>Note: the affected accounts are shown and must relog</p>"
         $html += "<ul>"
         foreach($account in $ActAsOSAccounts){
             $html += "<li>" + $account.Name + "</li>"
